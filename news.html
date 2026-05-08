@@ -2,7 +2,6 @@
 <html lang="ar" dir="rtl">
 
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -22,7 +21,7 @@ font-family:Tajawal,sans-serif;
 
 body{
 background:#0b0b0f;
-color:#fff;
+color:white;
 padding-bottom:100px;
 }
 
@@ -65,7 +64,7 @@ border-radius:20px;
 overflow:hidden;
 border:1px solid #222;
 cursor:pointer;
-transition:.3s;
+transition:0.3s;
 }
 
 .news-card:hover{
@@ -89,6 +88,7 @@ font-size:18px;
 font-weight:bold;
 line-height:1.8;
 margin-bottom:10px;
+color:#fff;
 }
 
 .news-desc{
@@ -230,7 +230,6 @@ border-radius:50%;
 }
 
 </style>
-
 </head>
 
 <body>
@@ -238,11 +237,8 @@ border-radius:50%;
 <!-- HEADER -->
 
 <div class="header">
-
 <i class="fas fa-newspaper"></i>
-
 الأخبار الرياضية
-
 </div>
 
 <!-- NEWS -->
@@ -250,9 +246,7 @@ border-radius:50%;
 <div id="newsContainer" class="news-container">
 
 <div class="loading">
-
 جاري تحميل الأخبار...
-
 </div>
 
 </div>
@@ -266,8 +260,7 @@ border-radius:50%;
 <button class="close"
 onclick="closeModal()">✕</button>
 
-<img id="modalImg"
-src="">
+<img id="modalImg">
 
 <div class="modal-body">
 
@@ -288,37 +281,23 @@ id="modalDesc"></div>
 <div class="bottom-nav">
 
 <a href="index.html" class="nav-item">
-
 <i class="fas fa-home"></i>
-
 <span>الرئيسية</span>
-
 </a>
 
 <a href="matches.html" class="nav-item">
-
 <i class="fas fa-futbol"></i>
-
 <span>المباريات</span>
-
 </a>
 
-<a href="news.html"
-class="nav-item active">
-
+<a href="news.html" class="nav-item active">
 <i class="fas fa-newspaper"></i>
-
 <span>الأخبار</span>
-
 </a>
 
-<a href="settings.html"
-class="nav-item">
-
+<a href="settings.html" class="nav-item">
 <i class="fas fa-cog"></i>
-
 <span>الإعدادات</span>
-
 </a>
 
 </div>
@@ -334,81 +313,35 @@ async function loadNews(){
 const container =
 document.getElementById("newsContainer");
 
-container.innerHTML = `
-
-<div class="loading">
-
+container.innerHTML =
+`<div class="loading">
 جاري تحميل الأخبار...
-
-</div>
-
-`;
+</div>`;
 
 try{
-
-/* API */
 
 const res =
 await fetch("/api/news");
 
-/* تحقق */
-
-if(!res.ok){
-
-throw new Error("API ERROR");
-
-}
-
 const data =
 await res.json();
 
-/* لا توجد بيانات */
+if(!data.data || data.data.length === 0){
 
-if(!data || !data.data){
-
-container.innerHTML = `
-
-<div class="loading">
-
+container.innerHTML =
+`<div class="loading">
 لا توجد أخبار حاليا
-
-</div>
-
-`;
+</div>`;
 
 return;
 
 }
 
-/* تخزين */
-
 newsData = data.data;
-
-/* تنظيف */
 
 container.innerHTML = "";
 
-/* عرض الأخبار */
-
 newsData.forEach((article,i)=>{
-
-const title =
-article.title ||
-"بدون عنوان";
-
-const desc =
-article.description ||
-"اضغط لقراءة تفاصيل الخبر";
-
-const image =
-article.image ||
-"https://images.unsplash.com/photo-1508098682722-e99c643e7485?q=80&w=1200";
-
-const date =
-article.pubDate
-? new Date(article.pubDate)
-.toLocaleString('ar-EG')
-: "";
 
 container.innerHTML += `
 
@@ -416,29 +349,22 @@ container.innerHTML += `
 onclick="openModal(${i})">
 
 <img class="news-image"
-
-src="${image}"
-
+src="${article.image}"
 onerror="this.src='https://images.unsplash.com/photo-1508098682722-e99c643e7485?q=80&w=1200'">
 
 <div class="news-content">
 
 <div class="news-title">
-
-${title}
-
+${article.title}
 </div>
 
 <div class="news-desc">
-
-${desc}
-
+${article.description}
 </div>
 
 <div class="news-date">
-
-${date}
-
+${new Date(article.pubDate)
+.toLocaleString('ar-EG')}
 </div>
 
 </div>
@@ -449,19 +375,14 @@ ${date}
 
 });
 
-}catch(err){
+}catch(e){
 
-console.log(err);
+console.log(e);
 
-container.innerHTML = `
-
-<div class="loading">
-
+container.innerHTML =
+`<div class="loading">
 فشل تحميل الأخبار
-
-</div>
-
-`;
+</div>`;
 
 }
 
@@ -474,20 +395,15 @@ function openModal(i){
 const item = newsData[i];
 
 document.getElementById("modalImg").src =
-
-item.image ||
-"https://images.unsplash.com/photo-1508098682722-e99c643e7485?q=80&w=1200";
+item.image;
 
 document.getElementById("modalTitle").innerText =
-
-item.title || "";
+item.title;
 
 document.getElementById("modalDesc").innerText =
-
-item.description || "";
+item.description;
 
 document.getElementById("modal").style.display =
-
 "flex";
 
 }
@@ -497,12 +413,11 @@ document.getElementById("modal").style.display =
 function closeModal(){
 
 document.getElementById("modal").style.display =
-
 "none";
 
 }
 
-/* إغلاق عند الضغط بالخارج */
+/* إغلاق عند الضغط خارج النافذة */
 
 window.onclick = function(e){
 
