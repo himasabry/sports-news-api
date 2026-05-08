@@ -19,8 +19,21 @@ export default async function handler(req, res) {
       const title =
       (block.match(/<title>(.*?)<\/title>/) || [])[1] || "";
 
-      const description =
-      (block.match(/<description>(.*?)<\/description>/) || [])[1] || "";
+      let rawDescription =
+(block.match(/<description>(.*?)<\/description>/) || [])[1] || "";
+
+/* تنظيف HTML */
+rawDescription = rawDescription
+.replace(/<!\[CDATA\[|\]\]>/g,'')
+.replace(/<a[^>]*>.*?<\/a>/g,'')
+.replace(/<[^>]+>/g,'')
+.replace(/&lt;/g,'')
+.replace(/&gt;/g,'')
+.replace(/&amp;/g,'')
+.trim();
+
+const description =
+rawDescription || "اضغط لقراءة تفاصيل الخبر";
 
       const pubDate =
       (block.match(/<pubDate>(.*?)<\/pubDate>/) || [])[1] || "";
