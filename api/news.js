@@ -1,40 +1,63 @@
 export default async function handler(req, res) {
+
   try {
 
-    const url = "https://news.google.com/rss/search?q=كرة+القدم+الدوري+المصري&hl=ar&gl=EG&ceid=EG:ar";
+    const rss =
+    "https://news.google.com/rss/search?q=كرة+القدم&hl=ar&gl=EG&ceid=EG:ar";
 
-    const response = await fetch(url);
+    const response = await fetch(rss);
     const text = await response.text();
 
-    // تحويل RSS بسيط بدون مكتبات
     const items = [...text.matchAll(/<item>([\s\S]*?)<\/item>/g)];
 
-    const news = items.map(item => {
+    let news = items.map(item => {
 
       const block = item[1];
 
-      const title = (block.match(/<title>(.*?)<\/title>/) || [])[1] || "";
-      const link = (block.match(/<link>(.*?)<\/link>/) || [])[1] || "";
-      const pubDate = (block.match(/<pubDate>(.*?)<\/pubDate>/) || [])[1] || "";
+      const title =
+      (block.match(/<title>(.*?)<\/title>/) || [])[1] || "";
+
+      const link =
+      (block.match(/<link>(.*?)<\/link>/) || [])[1] || "";
+
+      const description =
+      (block.match(/<description>(.*?)<\/description>/) || [])[1] || "";
+
+      const pubDate =
+      (block.match(/<pubDate>(.*?)<\/pubDate>/) || [])[1] || "";
 
       return {
-        title,
+        title: title.replace(/<!\[CDATA\[|\]\]>/g, ""),
+        description: description
+          .replace(/<[^>]*>/g, "")
+          .replace(/<!\[CDATA\[|\]\]>/g, "")
+          .slice(0, 200),
+
+        image:
+        "https://images.unsplash.com/photo-1508098682722-e99c643e7485",
+
         link,
         pubDate
       };
 
     });
 
-    res.status(200).json({
+    // إزالة الفاضي
+    news = news.filter(n => n.title);
+
+    return res.status(200).json({
       success: true,
       count: news.length,
       data: news
     });
 
   } catch (e) {
-    res.status(500).json({
+
+    return res.status(500).json({
       success: false,
       error: e.message
     });
+
   }
+
 }
